@@ -1,15 +1,21 @@
 #include <reg51.h>
 #include <string.h> //后面字符串函数中取得数组的个数中用到;调用strlen函数
 
-//重新定义各个控制引脚的名称
+// 声明常量
+/** 定义字符串 **/
+unsigned char code title[] = {"Multi-Function Clock"}; // 标题
+unsigned char code forward[] = {"Key 8: forward"};     // 正计时
+unsigned char code backward[] = {"Key 7: backward"};   // 倒计时
+unsigned char code set_time[] = {"Please set time"};   // 设置时间
+unsigned char code confirm[] = {"Key 6: confirm"};     // 确认
 
+/** 参数 **/
+const int SECOND_PARAM 120;
+
+//重新定义各个控制引脚的名称
 sbit rs = P1 ^ 0; //重定义,rs电平为1则传送数据,为0则转送指令
 sbit rw = P1 ^ 1; //控制LCD读或者写;为1则读LCD,为0则写入LCD
 sbit en = P1 ^ 2; //LCD行动控制,EN为下降沿则交互执行,即EN = 1;跟着EN = 0;
-/** 定义字符串 **/
-unsigned char code title[] = {"Multi-Function Clock"}; //title
-unsigned char code forward[] = {"Key 8: forward"};     //forward
-unsigned char code backward[] = {"Key 7: backward"};   //backward
 
 /** 按键配置 **/
 sbit forward_btn = P2 ^ 7;  //key8
@@ -19,8 +25,12 @@ sbit reset_btn = P2 ^ 4;    //key5 (不需要软件实现)
 sbit t2_btn = P2 ^ 1;       //key2
 sbit t1_btn = P2 ^ 0;       //key1
 
-/** 延时函数 **/
-void delay(int i) //无返回值 函数名 (定义整形变量  名称 i)
+/**
+ * @brief 延时函数
+ * 
+ * @param i 
+ */
+void delay(int i)
 {
   int t;                      //定义整形变量 名称t
   for (; i >= 1; i--)         //循环 (空函数; 判断i是否大于或等于1; i减1<自减>) i的值是调用此函数时设定的
@@ -31,9 +41,19 @@ void delay(int i) //无返回值 函数名 (定义整形变量  名称 i)
   }
 }
 
-/** 读忙子程序 **/
-// 读忙字程序,用于判断LCD液晶是否忙状态.如果不进行判断可能会导致数据写入LCD失败.
+/**
+ * @brief 延时1秒
+ * 
+ */
+void delay_second()
+{
+  delay(SECOND_PARAM)
+}
 
+/**
+ * @brief 读忙字程序,用于判断LCD液晶是否忙状态.如果不进行判断可能会导致数据写入LCD失败.
+ * 
+ */
 void read_busy() //无返回值 函数名 (空)
 {
   P0 = 0xff; //把0xff发送给LCD的数据总线
@@ -46,7 +66,12 @@ void read_busy() //无返回值 函数名 (空)
   en = 0; //使能端置0(低电平)
 }
 
-/** 写数据或指令子程序 **/
+/**
+ * @brief 写数据或指令子程序
+ * 
+ * @param x 
+ * @param DATA 
+ */
 void ddata(int x, unsigned char DATA) //无返回值 函数名 (定义整形变量 x, 定义长字符型变量 DDATA)
 {
   read_busy(); //读忙子程序
@@ -57,7 +82,10 @@ void ddata(int x, unsigned char DATA) //无返回值 函数名 (定义整形变�
   en = 0;      //使能端置0; 接上一条指令形成一个下降沿,LCD识别到下降沿信号则读取总线内容
 }
 
-/** LCD初始化函数 **/
+/**
+ * @brief LCD初始化函数
+ * 
+ */
 void lcd_init() //无返回值 函数名 (空)
 {
   rs = 1;         //rs设置为 数据
@@ -74,7 +102,13 @@ void lcd_init() //无返回值 函数名 (空)
   ddata(0, 0x0c); //0x0c  表示开显示，不显示光标
 }
 
-/** 显示单个字符 **/
+/**
+ * @brief 显示单个字符
+ * 
+ * @param i 
+ * @param j 
+ * @param DDATA 
+ */
 void display_char(unsigned char i, unsigned char j, unsigned char DDATA) //无返回值 函数名 (定义字符形参i, 字符形参j, 字符形参DDATA)
 {
   if (i) //如果 (i的值为1<真>)
@@ -86,7 +120,13 @@ void display_char(unsigned char i, unsigned char j, unsigned char DDATA) //无�
   ddata(1, DDATA); //函数名 (数据, 内容)
 }
 
-/** 显示字符串 **/
+/**
+ * @brief 显示字符串
+ * 
+ * @param y 
+ * @param x 
+ * @param shuzu0 
+ */
 void display_string(unsigned char y, unsigned char x, unsigned char shuzu0[]) //函数名 参数定义
 {
   unsigned char j;        //参数定义
@@ -111,31 +151,168 @@ void display_string(unsigned char y, unsigned char x, unsigned char shuzu0[]) //
   }
 }
 
-/** 主函数 **/
-void main() //主函数
+/**
+ * @brief 初始化至初始状态
+ * 
+ */
+void init_all()
 {
+  delay(15);              //长延时
+  lcd_init();             //初始化LCD
+  buttons_init();         //初始化按键
+  digital_display_init(); //初始化数码管
 
-  delay(15); //长延时
+  display_string(0, 0, forward);  //显示正计时提示
+  display_string(1, 0, backward); //显示倒计时提示
+}
 
-  lcd_init(); //初始化LCD
+/**
+ * @brief 主函数
+ * 
+ */
+void main()
+{
+  init_all();
 
-  P3 = 0x11;
+  while (1) // 开始循环状态
+  {
+    if (forward_btn == 1) // 按下正计时开关
+    {
+      lcd_init();                     // 清屏
+      display_string(0, 0, set_time); //显示设置时间提示
+      display_string(1, 0, confirm);  //显示确认提示
 
-  display_string(0, 0, forward); //显示字符串
+      int time = set_time(); //设置时间，等待确认
+      count_time(time, 1);   //开始正计时
+      //TODO  响蜂鸣器
+      init_all();
+    }
 
-  display_string(1, 0, backward); //显示字符串
+    if (backward_btn == 1) // 按下倒计时开关
+    {
+      lcd_init();                     // 清屏
+      display_string(0, 0, set_time); //显示设置时间提示
+      display_string(1, 0, confirm);  //显示确认提示
+
+      int time = set_time(); //设置时间，等待确认
+      count_time(time, -1);  //开始倒计时
+      //TODO  响蜂鸣器
+      init_all();
+    }
+  }
+}
+
+/**
+ * @brief 初始化按键电位
+ * 
+ */
+void buttons_init()
+{
+  forward_btn = 0;
+  backward_btn = 0;
+  confirm_btn = 0;
+  t2_btn = 0;
+  t1_btn = 0;
+}
+
+/**
+ * @brief 初始化数码管，显示00
+ * 
+ */
+void digital_display_init()
+{
+  digital_display(0);
+}
+
+/**
+ * @brief 显示指定的数字
+ * 
+ * @param time 计时时间（个位+十位*16）
+ */
+void digital_display(int time)
+{
+  P3 = time;
+}
+
+/**
+ * @brief Set the time object
+ * 
+ * @return int 计时时间（个位+十位*16）
+ */
+int set_time()
+{
+  // 初始化
+  t1_btn = 0;
+  t2_btn = 0;
+  confirm_btn = 0;
+  t1_previous = 0;
+  t2_previous = 0;
+  // t1个位，t2十位
+  t1_count = 0;
+  t2_count = 0;
   while (1)
   {
-    lcd_init();
-    if (forward_btn == 1)
+    /* 个位 */
+    if (t1_btn ^ t1_previous == 1) // 如果t1状态发生改变
     {
-      lcd_init();
-      display_string(0, 0, title);
+      t1_previous = !t1_previous; // t1_previous取反
+      t1_count++;                 //更新t1数值
+
+      if (t1_count > 9)
+      {
+        t1_count = 0; //若超过9则归0
+      }
+      digital_display(t1_count + 16 * t2_count); //刷新显示
     }
-    else
+
+    /* 十位 */
+    if (t2_btn ^ t2_previous == 1) // 如果t2状态发生改变(和上面一样，暂时不知道咋么复用)
     {
-      lcd_init();
-      display_string(0, 0, forward);
+      t2_previous = !t2_previous; // t2_previous取反
+      t2_count++;                 //更新t2数值
+
+      if (t2_count > 9)
+      {
+        t2_count = 0; //若超过9则归0
+      }
+      digital_display(t1_count + 16 * t2_count); //刷新显示
     }
+
+    /* 按下确认按键后退出设置 */
+    if (confirm_btn == 1)
+    {
+      break;
+    }
+  }
+  return t1_count + 16 * t2_count;
+}
+
+/**
+ * @brief 计时    
+ * 
+ * @param time 计时时间（个位+十位*16）
+ * @param order 顺序。1:正计时，-1:倒计时
+ */
+void count_time(int time, int order)
+{
+  int i;
+  int curr_time; // 显示的时间
+  if (order == 1)
+  {
+    curr_time = 0; //正计时
+  }
+  else
+  {
+    curr_time == -1 //倒计时
+  }
+
+  delay(15);
+  digital_display(curr_time); //显示初始值
+
+  for (i = 0; i <= time; i++)
+  {
+    delay_second();             //等待1s
+    curr_time += i * order;     //时间递增 or 递减
+    digital_display(curr_time); //更新数码管显示
   }
 }
