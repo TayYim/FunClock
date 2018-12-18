@@ -3,31 +3,31 @@ extern void delay_second();
 extern void digital_display(int time);
 
 /**
- * @brief è®¡æ—¶    
+ * @brief ¼ÆÊ±    
  * 
- * @param time è®¡æ—¶æ—¶é—´ï¼ˆåè¿›åˆ¶ï¼‰
- * @param order é¡ºåºã€‚1:æ­£è®¡æ—¶ï¼Œ-1:å€’è®¡æ—¶
+ * @param time ¼ÆÊ±Ê±¼ä£¨Ê®½øÖÆ£©
+ * @param order Ë³Ğò¡£1:Õı¼ÆÊ±£¬-1:µ¹¼ÆÊ±
  */
 void count_time(int time, int order)
 {
     int i;
-    int curr_time; // æ˜¾ç¤ºçš„æ—¶é—´
+    int curr_time; // ÏÔÊ¾µÄÊ±¼ä
     if (order == 1)
     {
-        curr_time = 0; //æ­£è®¡æ—¶
+        curr_time = 0; //Õı¼ÆÊ±
     }
     else
     {
-        curr_time == time; //å€’è®¡æ—¶
+        curr_time == time; //µ¹¼ÆÊ±
     }
 
     delay(200);
-    digital_display(curr_time); //æ˜¾ç¤ºåˆå§‹å€¼
+    digital_display(curr_time); //ÏÔÊ¾³õÊ¼Öµ
 
     for (i = 0; i <= time; i++)
     {
-        delay_second();             //ç­‰å¾…1s
-        curr_time += i * order;     //æ—¶é—´é€’å¢ or é€’å‡
-        digital_display(curr_time); //æ›´æ–°æ•°ç ç®¡æ˜¾ç¤º
+        delay_second();             //µÈ´ı1s
+        curr_time += i * order;     //Ê±¼äµİÔö or µİ¼õ
+        digital_display(curr_time); //¸üĞÂÊıÂë¹ÜÏÔÊ¾
     }
 }

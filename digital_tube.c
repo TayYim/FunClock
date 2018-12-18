@@ -1,9 +1,9 @@
 #include <reg51.h>
 
 /**
- * @brief æ˜¾ç¤ºæŒ‡å®šçš„æ•°å­—
+ * @brief ÏÔÊ¾Ö¸¶¨µÄÊı×Ö
  * 
- * @param time è®¡æ—¶æ—¶é—´(åè¿›åˆ¶)
+ * @param time ¼ÆÊ±Ê±¼ä(Ê®½øÖÆ)
  */
 void digital_display(int time)
 {
@@ -13,7 +13,7 @@ void digital_display(int time)
 }
 
 /**
- * @brief åˆå§‹åŒ–æ•°ç ç®¡ï¼Œæ˜¾ç¤º00
+ * @brief ³õÊ¼»¯ÊıÂë¹Ü£¬ÏÔÊ¾00
  * 
  */
 void digital_display_init()

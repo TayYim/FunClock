@@ -1,53 +1,54 @@
-extern t1_btn;
-extern t2_btn;
-extern confirm_btn;
+#include <reg51.h>
+sbit confirm_btn = P2 ^ 5; //key6
+sbit t2_btn = P2 ^ 1;      //key2
+sbit t1_btn = P2 ^ 0;      //key1
 extern void digital_display(int time);
 
 /**
  * @brief Set the time object
  * 
- * @return int è®¡æ—¶æ—¶é—´(åè¿›åˆ¶)
+ * @return int ¼ÆÊ±Ê±¼ä(Ê®½øÖÆ)
  */
 int set_time()
 {
     int t1_previous = 0;
     int t2_previous = 0;
-    // t1ä¸ªä½ï¼Œt2åä½
+    // t1¸öÎ»£¬t2Ê®Î»
     int t1_count = 0;
     int t2_count = 0;
-    // åˆå§‹åŒ–
+    // ³õÊ¼»¯
     t1_btn = 0;
     t2_btn = 0;
     confirm_btn = 0;
     while (1)
     {
-        /* ä¸ªä½ */
-        if (t1_btn ^ t1_previous == 1) // å¦‚æœt1çŠ¶æ€å‘ç”Ÿæ”¹å˜
+        /* ¸öÎ» */
+        if (t1_btn ^ t1_previous == 1) // Èç¹ût1×´Ì¬·¢Éú¸Ä±ä
         {
-            t1_previous = !t1_previous; // t1_previouså–å
-            t1_count++;                 //æ›´æ–°t1æ•°å€¼
+            t1_previous = !t1_previous; // t1_previousÈ¡·´
+            t1_count++;                 //¸üĞÂt1ÊıÖµ
 
             if (t1_count > 9)
             {
-                t1_count = 0; //è‹¥è¶…è¿‡9åˆ™å½’0
+                t1_count = 0; //Èô³¬¹ı9Ôò¹é0
             }
-            digital_display(t1_count + t2_count * 10); //åˆ·æ–°æ˜¾ç¤º
+            digital_display(t1_count + t2_count * 10); //Ë¢ĞÂÏÔÊ¾
         }
 
-        /* åä½ */
-        if (t2_btn ^ t2_previous == 1) // å¦‚æœt2çŠ¶æ€å‘ç”Ÿæ”¹å˜(å’Œä¸Šé¢ä¸€æ ·ï¼Œæš‚æ—¶ä¸çŸ¥é“å’‹ä¹ˆå¤ç”¨)
+        /* Ê®Î» */
+        if (t2_btn ^ t2_previous == 1) // Èç¹ût2×´Ì¬·¢Éú¸Ä±ä(ºÍÉÏÃæÒ»Ñù£¬ÔİÊ±²»ÖªµÀÕ¦Ã´¸´ÓÃ)
         {
-            t2_previous = !t2_previous; // t2_previouså–å
-            t2_count++;                 //æ›´æ–°t2æ•°å€¼
+            t2_previous = !t2_previous; // t2_previousÈ¡·´
+            t2_count++;                 //¸üĞÂt2ÊıÖµ
 
             if (t2_count > 9)
             {
-                t2_count = 0; //è‹¥è¶…è¿‡9åˆ™å½’0
+                t2_count = 0; //Èô³¬¹ı9Ôò¹é0
             }
-            digital_display(t1_count + t2_count * 10); //åˆ·æ–°æ˜¾ç¤º
+            digital_display(t1_count + t2_count * 10); //Ë¢ĞÂÏÔÊ¾
         }
 
-        /* æŒ‰ä¸‹ç¡®è®¤æŒ‰é”®åé€€å‡ºè®¾ç½® */
+        /* °´ÏÂÈ·ÈÏ°´¼üºóÍË³öÉèÖÃ */
         if (confirm_btn == 1)
         {
             break;
