@@ -10,6 +10,7 @@ extern void digital_display_init();          //数码管初始化函数
 extern void lcd_init();                      //LCD初始化函数
 extern int set_time(int order);              //设置时间函数
 extern void count_time(int time, int order); //计时函数
+extern void lcd_start();
 
 // 声明常量
 /** 定义字符串 **/
@@ -19,6 +20,7 @@ const unsigned char code str_backward[] = {"Key 7: backward"};   // 倒计时
 const unsigned char code str_set_time[] = {"Please set time"};   // 设置时间
 const unsigned char code str_confirm[] = {"Repress to confirm"}; // 确认
 const unsigned char code str_complete[] = {"Time's up!"};        // complete
+const unsigned char code str_reset[] = {"Reset: Key 5"};
 
 /** 按键配置 **/
 sbit forward_btn = P2 ^ 7;  //key8
@@ -69,9 +71,9 @@ void init_all()
   delay(15);              //长延时
   lcd_init();             //初始化LCD
   digital_display_init(); //初始化数码管
-
-  display_string(0, 0, str_forward);  //显示正计时提示
-  display_string(1, 0, str_backward); //显示倒计时提示
+  display_string(0, 0, str_title);
+  display_string(1, 0, str_forward);  //显示正计时提示
+  display_string(2, 0, str_backward); //显示倒计时提示
 }
 
 /**
@@ -82,11 +84,6 @@ void main()
 {
   int realtime; //用户输入的时间
 
-  lcd_init();                      //初始化LCD
-  display_string(0, 0, str_title); //显示欢迎页面
-
-  delay(2000); //延迟等待
-
   init_all(); //进入系统
 
   while (1) // 开始循环状态
@@ -94,14 +91,14 @@ void main()
     realtime = 0;         //重置为0
     if (forward_btn == 1) // 按下正计时开关
     {
-      lcd_init();                         // 清屏
-      display_string(0, 0, str_set_time); //显示设置时间提示
-      display_string(1, 0, str_confirm);  //显示确认提示
+      lcd_start();                        // 清屏
+      display_string(1, 0, str_set_time); //显示设置时间提示
+      display_string(2, 0, str_confirm);  //显示确认提示
 
       realtime = set_time(1);  //设置时间，等待确认
       count_time(realtime, 1); //开始正计时
-      lcd_init();
-      display_string(0, 0, str_complete); //显示计时结束
+      lcd_start();
+      display_string(1, 0, str_complete); //显示计时结束
       do_beep();                          //响蜂鸣器
       delay(2000);                        //延迟等待
       init_all();                         //重置
@@ -109,14 +106,14 @@ void main()
 
     if (backward_btn == 1) // 按下倒计时开关
     {
-      lcd_init();                         // 清屏
-      display_string(0, 0, str_set_time); //显示设置时间提示
-      display_string(1, 0, str_confirm);  //显示确认提示
+      lcd_start();                        // 清屏
+      display_string(1, 0, str_set_time); //显示设置时间提示
+      display_string(2, 0, str_confirm);  //显示确认提示
 
       realtime = set_time(-1);  //设置时间，等待确认
       count_time(realtime, -1); //开始倒计时
-      lcd_init();
-      display_string(0, 0, str_complete); //显示计时结束
+      lcd_start();
+      display_string(1, 0, str_complete); //显示计时结束
       do_beep();                          //响蜂鸣器
       delay(2000);                        //延迟等待
       init_all();                         //重置

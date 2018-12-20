@@ -2,6 +2,7 @@
 #include <string.h> //后面字符串函数中取得数组的个数中用到;调用strlen函数
 
 extern void delay(int i);
+extern unsigned char code str_title[];
 
 //重新定义各个控制引脚的名称
 sbit rs = P1 ^ 0; //重定义,rs电平为1则传送数据,为0则转送指令
@@ -69,11 +70,27 @@ void lcd_init() //无返回值 函数名 (空)
  */
 void display_char(unsigned char i, unsigned char j, unsigned char DDATA) //无返回值 函数名 (定义字符形参i, 字符形参j, 字符形参DDATA)
 {
-    if (i) //如果 (i的值为1<真>)
+    int add;
+    switch (i)
     {
-        j = j + 0x40; //第二行起始地址加上列数为字符显示地址 //则把j加0x40后的值赋给j;;等同于j += 0x40        ,
+    case 0:
+        add = 0x00; //0
+        break;
+    case 1:
+        add = 0x40; //64
+        break;
+    case 2:
+        add = 0x14; //20
+        break;
+    case 3:
+        add = 0x54; //84
+        break;
+    default:
+        add = 0x00;
     }
-    j = j + 0x80;    //同上,0x80指第一行首列的地址,若if语句有效, 则最终j=  第二行首字母的地址
+    add = add + 0x80;
+    j = j + add;
+
     ddata(0, j);     //函数名 (指令, 内容)
     ddata(1, DDATA); //函数名 (数据, 内容)
 }
@@ -107,4 +124,11 @@ void display_string(unsigned char y, unsigned char x, unsigned char string[]) //
             k = 0;                         //k 置0,  for循环退出                                                                                !
         }
     }
+}
+
+void lcd_start()
+{
+    lcd_init();
+    delay(5);
+    display_string(0, 0, str_title);
 }

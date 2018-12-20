@@ -1,12 +1,83 @@
-#include <reg51.h>
 #include <stdio.h>
+#include <reg51.h>
+#include <string.h>
 extern void delay(int i);
 extern void delay_second();
+extern void display_char(unsigned char i, unsigned char j, unsigned char DDATA);
 extern void digital_display(int time);
 extern void display_string(unsigned char y, unsigned char x, unsigned char string[]);
 extern void lcd_init();
+extern void lcd_start();
 
-sbit pause_btn = P2 ^ 2; //key3(暂停)
+extern unsigned char code str_reset[];
+char str_prompt[20];
+const int WIDTH = 20;
+const char PROGRESS_MARK = '*';
+
+sbit pause_btn = P2 ^ 2; //key3
+
+/**
+ * @brief   显示状态信息
+ * 
+ * @param time 
+ * @param order 
+ * @param current 
+ */
+void display_status(int time, int order, int current)
+{
+    char str_status[20];
+    int remain;
+    if (order == 1)
+    {
+        remain = time - current;
+    }
+    else
+    {
+        remain = current;
+    }
+    sprintf(str_status, "Now:%ds,Remain:%ds", current, remain);
+    lcd_start();
+    display_string(1, 0, str_prompt);
+    display_string(2, 0, str_status);
+    display_string(3, 0, str_reset);
+}
+
+/**
+ * @brief 显示运行过程中的指引信息
+ * 
+ */
+void display_instruction()
+{
+    lcd_start();
+    display_string(1, 0, str_prompt);
+    display_string(2, 0, str_reset);
+}
+
+/**
+ * @brief 清除进度条
+ * 
+ */
+void clear_progress()
+{
+    display_string(3, 0, "                    ");
+}
+
+/**
+ * @brief 显示进度条
+ * 
+ * @param time 
+ * @param current 
+ */
+void display_progress(int time, int current)
+{
+    int current_progress = WIDTH * current / time;
+    int i;
+    clear_progress();
+    for (i = 0; i < current_progress; i++)
+    {
+        display_char(3, i, PROGRESS_MARK);
+    }
+}
 
 /**
  * @brief 计时    
@@ -16,25 +87,21 @@ sbit pause_btn = P2 ^ 2; //key3(暂停)
  */
 void count_time(int time, int order)
 {
-    char str_prompt[20];                 //显示提示的字符串
-    char str_reset[] = {"Reset: Key 5"}; //显示取消的字符串
-    int i;                               //计数变量
-    int curr_time;                       // 显示的时间
+    int i;
+    int curr_time; // 显示的时间
 
     if (order == 1)
     {
-        curr_time = 0; //正计时，从0开始
+        curr_time = 0; //正计时
         sprintf(str_prompt, "Forward:%ds", time);
     }
     else
     {
-        curr_time = time; //倒计时，从time开始
+        curr_time = time; //倒计时
         sprintf(str_prompt, "Backward:%ds", time);
     }
 
-    lcd_init();                       //LCD初始化
-    display_string(0, 0, str_prompt); //显示模式信息
-    display_string(1, 0, str_reset);  //显示取消提示
+    display_instruction();
 
     delay(200);
     digital_display(curr_time); //显示初始值
@@ -43,8 +110,21 @@ void count_time(int time, int order)
     {
         delay_second();                         //等待1s
         digital_display(curr_time + i * order); //更新数码管显示
-        while (pause_btn == 1)
-            ; //暂停
+
+        display_progress(time, curr_time + i * order); //显示进度条
+
+        /**
+         * @brief 暂停
+         * 
+         */
+        if (pause_btn == 1)
+        {
+            display_status(time, order, curr_time + i * order);
+            while (pause_btn == 1)
+                ; //pause
+            display_instruction();
+        }
     }
+    clear_progress();
     delay(200);
 }
