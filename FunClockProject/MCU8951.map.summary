@@ -1,0 +1,14 @@
+Analysis & Synthesis Status : Successful - Fri Dec 20 15:58:38 2002
+Quartus II Version : 9.0 Build 132 02/25/2009 SJ Full Version
+Revision Name : MCU8951
+Top-level Entity Name : MCU8951
+Family : Cyclone III
+Total logic elements : 1,919
+    Total combinational functions : 1,880
+    Dedicated logic registers : 689
+Total registers : 689
+Total pins : 52
+Total virtual pins : 0
+Total memory bits : 34,816
+Embedded Multiplier 9-bit elements : 0
+Total PLLs : 1

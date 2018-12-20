@@ -1,0 +1,138 @@
+C51 COMPILER V9.01   MAIN                                                                  12/20/2002 22:02:44 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <string.h> //后面字符串函数中取得数组的个数中用到;调用strlen函数
+   3          
+   4          extern void delay(int i);
+   5          extern void delay_second();
+   6          extern void display_string(unsigned char y, unsigned char x, unsigned char string[]);
+   7          extern void digital_display(int time);
+   8          extern void digital_display_init();
+   9          extern void lcd_init();
+  10          extern void digital_display(int time);
+  11          extern int set_time(int order);
+  12          extern void count_time(int time, int order);
+  13          extern void lcd_start();
+  14          
+  15          // 声明常量
+  16          /** 定义字符串 **/
+  17          const unsigned char code str_title[] = {"Multi-Function Clock"}; // 标题
+  18          const unsigned char code str_forward[] = {"Key 8: forward"};     // 正计时
+  19          const unsigned char code str_backward[] = {"Key 7: backward"};   // 倒计时
+  20          const unsigned char code str_set_time[] = {"Please set time"};   // 设置时间
+  21          const unsigned char code str_confirm[] = {"Repress to confirm"};     // 确认
+  22          const unsigned char code str_complete[] = {"Time's up!"};     // complete
+  23          const unsigned char code str_reset[]={"Reset: Key 5"};
+  24          
+  25          /** 按键配置 **/
+  26          sbit forward_btn = P2 ^ 7;  //key8
+  27          sbit backward_btn = P2 ^ 6; //key7
+  28          sbit confirm_btn = P2 ^ 5;  //key6
+  29          sbit reset_btn = P2 ^ 4;    //key5 (不需要软件实现)
+  30          sbit pause_btn = P2 ^ 2;       //key3
+  31          sbit t2_btn = P2 ^ 1;       //key2
+  32          sbit t1_btn = P2 ^ 0;       //key1
+  33          sbit beep = P1^3;
+  34          
+  35          void do_beep(){
+  36   1              int i,j;
+  37   1              for(i=0;i<500;i++){
+  38   2                      for(j=0;j<300;j++){
+  39   3                              beep = ~beep;
+  40   3                      }
+  41   2              }
+  42   1              for(i=0;i<500;i++){
+  43   2                      for(j=0;j<200;j++){
+  44   3                              beep = ~beep;
+  45   3                      }
+  46   2              }
+  47   1              for(i=0;i<500;i++){
+  48   2                      for(j=0;j<80;j++){
+  49   3                              beep = ~beep;
+  50   3                      }
+  51   2              }
+  52   1      }
+  53          
+  54          /**
+  55           * @brief 初始化至初始状态
+C51 COMPILER V9.01   MAIN                                                                  12/20/2002 22:02:44 PAGE 2   
+
+  56           * 
+  57           */
+  58          void init_all()
+  59          {
+  60   1        delay(15);              //长延时
+  61   1        lcd_init();             //初始化LCD
+  62   1        digital_display_init(); //初始化数码管
+  63   1        display_string(0, 0,str_title);
+  64   1        display_string(1, 0, str_forward);  //显示正计时提示
+  65   1        display_string(2, 0, str_backward); //显示倒计时提示
+  66   1      }
+  67          
+  68          /**
+  69           * @brief 主函数
+  70           * 
+  71           */
+  72          void main()
+  73          {
+  74   1        int realtime;
+  75   1      
+  76   1        init_all();
+  77   1      
+  78   1        while (1) // 开始循环状态
+  79   1        {
+  80   2          realtime = 0;
+  81   2          if (forward_btn == 1) // 按下正计时开关
+  82   2          {
+  83   3            lcd_start();                         // 清屏
+  84   3            display_string(1, 0, str_set_time); //显示设置时间提示
+  85   3            display_string(2, 0, str_confirm);  //显示确认提示
+  86   3      
+  87   3            realtime = set_time(1);   //设置时间，等待确认
+  88   3            count_time(realtime, 1); //开始正计时
+  89   3                lcd_start();
+  90   3                display_string(1, 0, str_complete);
+  91   3                do_beep();
+  92   3                delay(2000);
+  93   3            init_all();
+  94   3          }
+  95   2      
+  96   2          if (backward_btn == 1) // 按下倒计时开关
+  97   2          {
+  98   3            lcd_start();                         // 清屏
+  99   3            display_string(1, 0, str_set_time); //显示设置时间提示
+ 100   3            display_string(2, 0, str_confirm);  //显示确认提示
+ 101   3      
+ 102   3            realtime = set_time(-1);    //设置时间，等待确认
+ 103   3            count_time(realtime, -1); //开始倒计时
+ 104   3            lcd_start();
+ 105   3                display_string(1, 0, str_complete);
+ 106   3                do_beep();
+ 107   3                delay(1000);
+ 108   3            init_all();
+ 109   3          }
+ 110   2        }
+ 111   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    311    ----
+   CONSTANT SIZE    =    111    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.01   MAIN                                                                  12/20/2002 22:02:44 PAGE 3   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

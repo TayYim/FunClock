@@ -1,0 +1,8 @@
+"STARTUP.obj",
+"main.obj",
+"common.obj",
+"digital_tube.obj",
+"led_util.obj",
+"time_counter.obj",
+"time_setter.obj" 
+TO "FunClock" 

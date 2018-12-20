@@ -1,0 +1,177 @@
+C51 COMPILER V9.01   LED_UTIL                                                              12/20/2002 22:02:44 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE LED_UTIL
+OBJECT MODULE PLACED IN led_util.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE led_util.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <string.h> //ºóÃæ×Ö·û´®º¯ÊıÖĞÈ¡µÃÊı×éµÄ¸öÊıÖĞÓÃµ½;µ÷ÓÃstrlenº¯Êı
+   3          
+   4          extern void delay(int i);
+   5          extern unsigned char code str_title[];
+   6          
+   7          //ÖØĞÂ¶¨Òå¸÷¸ö¿ØÖÆÒı½ÅµÄÃû³Æ
+   8          sbit rs = P1 ^ 0; //ÖØ¶¨Òå,rsµçÆ½Îª1Ôò´«ËÍÊı¾İ,Îª0Ôò×ªËÍÖ¸Áî
+   9          sbit rw = P1 ^ 1; //¿ØÖÆLCD¶Á»òÕßĞ´;Îª1Ôò¶ÁLCD,Îª0ÔòĞ´ÈëLCD
+  10          sbit en = P1 ^ 2; //LCDĞĞ¶¯¿ØÖÆ,ENÎªÏÂ½µÑØÔò½»»¥Ö´ĞĞ,¼´EN = 1;¸ú×ÅEN = 0;
+  11          
+  12          /**
+  13           * @brief ¶ÁÃ¦×Ö³ÌĞò,ÓÃÓÚÅĞ¶ÏLCDÒº¾§ÊÇ·ñÃ¦×´Ì¬.Èç¹û²»½øĞĞÅĞ¶Ï¿ÉÄÜ»áµ¼ÖÂÊı¾İĞ´ÈëLCDÊ§°Ü.
+  14           * 
+  15           */
+  16          void read_busy() //ÎŞ·µ»ØÖµ º¯ÊıÃû (¿Õ)
+  17          {
+  18   1          P0 = 0xff; //°Ñ0xff·¢ËÍ¸øLCDµÄÊı¾İ×ÜÏß
+  19   1          rs = 0;    //Ñ¡Ö¸Áî
+  20   1          rw = 1;    //Ñ¡Ôñ¶Á
+  21   1          en = 1;    //Ê¹ÄÜ¶ËÖÃ1(¸ßµçÆ½)
+  22   1          while (P0 & 0x80)
+  23   1              ;   //Ñ­»· (Èç¹ûP0ºÍ0x80ÏàµÈµÄ»°) P0 & 0x80ÏàÓë,¼´P0×ÜÏßµÄ8Î»¶ş½øÖÆÊıÓë10000000±È½Ï,
+  24   1                  //È«²¿ÏàÍ¬Ôò½á¹ûÎª 1<Õæ>;Ã¦×´Ì¬³ÉÁ¢,³ÌĞòÔÚ´Ë´¦ËÀÑ­»·ÏàÓë
+  25   1          en = 0; //Ê¹ÄÜ¶ËÖÃ0(µÍµçÆ½)
+  26   1      }
+  27          
+  28          /**
+  29           * @brief Ğ´Êı¾İ»òÖ¸Áî×Ó³ÌĞò
+  30           * 
+  31           * @param x 
+  32           * @param DATA 
+  33           */
+  34          void ddata(int x, unsigned char DATA) //ÎŞ·µ»ØÖµ º¯ÊıÃû (¶¨ÒåÕûĞÎ±äÁ¿ x, ¶¨Òå³¤×Ö·ûĞÍ±äÁ¿ DDATA)
+  35          {
+  36   1          read_busy(); //¶ÁÃ¦×Ó³ÌĞò
+  37   1          P0 = DATA;   //Èç¹û²»Ã¦,Ôò°Ñ²ÎÊı DDATA »ñÈ¡µ½µÄ±äÁ¿¸³Öµ¸ø ×ÜÏß<P0>
+  38   1          rw = 0;      //¶ÁĞ´¶ËÑ¡ÔñÎª Ğ´<0>
+  39   1          rs = x;      //Êı¾İ»òÖ¸Áî¶ËÑ¡ÔñÎª²ÎÊı <x>µÄÖµ, xµÄÖµÎª0»òÕß1;Îª0±íÊ¾×ÜÏß´«ÊäµÄÊÇ¿ØÖÆLCDÖ¸Áî,Îª1±íÊ¾ÒªÏ
+             -ÔÊ¾µÄÊı¾İ
+  40   1          en = 1;      //Ê¹ÄÜ¶ËÖÃ1
+  41   1          en = 0;      //Ê¹ÄÜ¶ËÖÃ0; ½ÓÉÏÒ»ÌõÖ¸ÁîĞÎ³ÉÒ»¸öÏÂ½µÑØ,LCDÊ¶±ğµ½ÏÂ½µÑØĞÅºÅÔò¶ÁÈ¡×ÜÏßÄÚÈİ
+  42   1      }
+  43          
+  44          /**
+  45           * @brief LCD³õÊ¼»¯º¯Êı
+  46           * 
+  47           */
+  48          void lcd_init() //ÎŞ·µ»ØÖµ º¯ÊıÃû (¿Õ)
+  49          {
+  50   1          rs = 1;         //rsÉèÖÃÎª Êı¾İ
+  51   1          rw = 1;         //rwÉèÖÃÎª ¶Á
+  52   1          en = 1;         //enÉèÖÃÎª¸ßµçÆ½
+  53   1          P0 = 0xff;      //×ÜÏßĞ´Èë0xff
+  54   1          delay(15);      //³¤ÑÓÊ±
+C51 COMPILER V9.01   LED_UTIL                                                              12/20/2002 22:02:44 PAGE 2   
+
+  55   1          ddata(0, 0x38); //º¯ÊıÃû (Ö¸Áî, Ö¸ÁîÄÚÈİ)  //  0·¢ËÍ¸øddataº¯ÊıÖĞµÄx,ÔÙ¾­ddataº¯Êı·¢ËÍ¸ørs,¼´rsÉèÖÃÎªÖ
+             -¸Áî;;0x38ÎªÖ¸ÁîÄÚÈİ
+  56   1          delay(5);       //¶ÌÑÓÊ±
+  57   1          ddata(0, 0x38); //0x38  ±íÊ¾ÉèÖÃ16*2ÏÔÊ¾£¬5*7µãÕó£¬8Î»Êı¾İ½Ó¿Ú
+  58   1          ddata(0, 0x08); //0x08  ±íÊ¾Ö»¿ªÏÔÊ¾
+  59   1          ddata(0, 0x01); //0x01  ±íÊ¾ÇåÆÁ
+  60   1          ddata(0, 0x06); //0x06  ±íÊ¾µØÖ·¼Ó1£¬µ±Ğ´ÈëÊı¾İµÄÊ±ºò¹â±êÓÒÒÆ
+  61   1          ddata(0, 0x0c); //0x0c  ±íÊ¾¿ªÏÔÊ¾£¬²»ÏÔÊ¾¹â±ê
+  62   1      }
+  63          
+  64          
+  65          /**
+  66           * @brief ÏÔÊ¾µ¥¸ö×Ö·û
+  67           * 
+  68           * @param i 
+  69           * @param j 
+  70           * @param DDATA 
+  71           */
+  72          void display_char(unsigned char i, unsigned char j, unsigned char DDATA) //ÎŞ·µ»ØÖµ º¯ÊıÃû (¶¨Òå×Ö·ûĞÎ²Îi,
+             - ×Ö·ûĞÎ²Îj, ×Ö·ûĞÎ²ÎDDATA)
+  73          {
+  74   1                      
+  75   1                      int add;
+  76   1                      switch(i){
+  77   2                              case 0:
+  78   2                                      add=0x00;//0
+  79   2                                      break;
+  80   2                              case 1:
+  81   2                                      add=0x40;//64
+  82   2                                      break;
+  83   2                              case 2:
+  84   2                                      add=0x14;//20
+  85   2                                      break;
+  86   2                              case 3:
+  87   2                                      add=0x54;//84
+  88   2                                      break;
+  89   2                              default:
+  90   2                                      add=0x00;
+  91   2                      }
+  92   1                      add = add + 0x80;
+  93   1                      j = j + add;
+  94   1                      
+  95   1          ddata(0, j);     //º¯ÊıÃû (Ö¸Áî, ÄÚÈİ)
+  96   1          ddata(1, DDATA); //º¯ÊıÃû (Êı¾İ, ÄÚÈİ)
+  97   1      }
+  98          
+  99          /**
+ 100           * @brief ÏÔÊ¾×Ö·û´®
+ 101           * 
+ 102           * @param y 
+ 103           * @param x 
+ 104           * @param string 
+ 105           */
+ 106          void display_string(unsigned char y, unsigned char x, unsigned char string[]) //º¯ÊıÃû ²ÎÊı¶¨Òå
+ 107          {
+ 108   1          unsigned char j;        //²ÎÊı¶¨Òå
+ 109   1          unsigned char i;        //²ÎÊı¶¨Òå
+ 110   1          int k = 1;              //¶¨ÒåÕûĞÎ²ÎÊık²¢¸³ÖµÎª1
+ 111   1          i = 0;                  //i¸³ÖµÎª0
+ 112   1          j = strlen(string) + x; //j = È¡Êı×é¸öÊı¼ÓÉÏx<Ê×ÁĞÎ»ÖÃ>µÄÖµ,×îÖÕjµÄÖµÎªÊı×éÖĞ×îºóÒ»Î»×Ö·ûµÄÁĞ,j×îÖÕÖµÔ
+             -Ú0~15Ö®¼ä
+ 113   1      
+C51 COMPILER V9.01   LED_UTIL                                                              12/20/2002 22:02:44 PAGE 3   
+
+ 114   1          for (; k > 0;)                         //Ñ­»· (¿Õ; Èç¹ûk´óÓÚ0;¿Õ)                                     
+             -                                   !
+ 115   1          {                                      //Ôò                                                           
+             -                                                             !
+ 116   2                                                 //ÅĞ¶Ï                                                         
+             -                                                       ! ËùÓĞ¼Ó "!" ±¸×¢µÄ´úÂë¿ÉÒÔÑ¹ËõÎª:
+ 117   2              if (x < j)                         //Èç¹û (µ±Ç°ÏÔÊ¾ÁĞÊıx < ×îºóÒ»Î»×Ö·ûµÄÁĞÊıj)                   
+             -                     ! while (x < j)
+ 118   2              {                                  //Ôò                                                           
+             -                                                             ! {
+ 119   3                  display_char(y, x, string[i]); //º¯ÊıÃû (ĞĞy<0»ò1>ËÍ³ö, ÁĞx<0~15>ËÍ³ö, Êı×é[µÚiÎ»]ËÍ³ö)       
+             -         !         display (y, x, string[i]);
+ 120   3                  x++;                           //ÁĞÊı¼Ó1                                                      
+             -                                                  !         x++;
+ 121   3                  i++;                           //Êı×éµÚiÎ»¼Ó1                                                 
+             -                                               !         i++;
+ 122   3              }                                  //                                                             
+             -                                           !  }
+ 123   2              else                               //·ñÔò                                                         
+             -                                                       !
+ 124   2              {                                  //                                                             
+             -                                           !
+ 125   3                  k = 0;                         //k ÖÃ0,  forÑ­»·ÍË³ö                                          
+             -                                      !
+ 126   3              }
+ 127   2          }
+ 128   1      }
+ 129          
+ 130          void lcd_start(){
+ 131   1              lcd_init();
+ 132   1              delay(5);
+ 133   1              display_string(0, 0,str_title);
+ 134   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    257    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

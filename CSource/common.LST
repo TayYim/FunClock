@@ -1,0 +1,51 @@
+C51 COMPILER V9.01   COMMON                                                                12/20/2002 22:02:44 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE COMMON
+OBJECT MODULE PLACED IN common.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE common.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /** ²ÎÊý **/
+   2          const int SECOND_PARAM = 1000;
+   3          
+   4          /**
+   5           * @brief ÑÓÊ±º¯Êý
+   6           * 
+   7           * @param i 
+   8           */
+   9          void delay(int i)
+  10          {
+  11   1          int t;                        //¶¨ÒåÕûÐÎ±äÁ¿ Ãû³Æt
+  12   1          for (; i >= 1; i--)           //Ñ­»· (¿Õº¯Êý; ÅÐ¶ÏiÊÇ·ñ´óÓÚ»òµÈÓÚ1; i¼õ1<×Ô¼õ>) iµÄÖµÊÇµ÷ÓÃ´Ëº¯ÊýÊ±Éè¶
+             -¨µÄ
+  13   1          {                             //ÈôiµÄÖµ´óÓÚ»òµÈÓÚ1;Ôò½øÈëÏÂÃæÒ»¸öÑ­»·
+  14   2              for (t = 120; t > 1; t--) //Ñ­»· (t¸³Öµ120; ÅÐ¶ÏtµÄÖµÊÇ·ñ´óÓÚ1; t×Ô¼õ)
+  15   2              {                         //¿Õº¯Êý
+  16   3              }
+  17   2          }
+  18   1      }
+  19          
+  20          /**
+  21           * @brief ÑÓÊ±1Ãë
+  22           * 
+  23           */
+  24          void delay_second()
+  25          {
+  26   1          delay(SECOND_PARAM);
+  27   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     41    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
