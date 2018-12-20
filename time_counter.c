@@ -1,9 +1,12 @@
+#include <reg51.h>
 #include <stdio.h>
 extern void delay(int i);
 extern void delay_second();
 extern void digital_display(int time);
 extern void display_string(unsigned char y, unsigned char x, unsigned char string[]);
 extern void lcd_init();
+
+sbit pause_btn = P2 ^ 2; //key3(暂停)
 
 /**
  * @brief 计时    
@@ -40,6 +43,8 @@ void count_time(int time, int order)
     {
         delay_second();                         //等待1s
         digital_display(curr_time + i * order); //更新数码管显示
+        while (pause_btn == 1)
+            ; //暂停
     }
     delay(200);
 }

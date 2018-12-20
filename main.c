@@ -25,6 +25,7 @@ sbit forward_btn = P2 ^ 7;  //key8
 sbit backward_btn = P2 ^ 6; //key7
 sbit confirm_btn = P2 ^ 5;  //key6
 sbit reset_btn = P2 ^ 4;    //key5 (不需要软件实现)
+sbit pause_btn = P2 ^ 2;    //key3(暂停)
 sbit t2_btn = P2 ^ 1;       //key2
 sbit t1_btn = P2 ^ 0;       //key1
 sbit beep = P1 ^ 3;         //蜂鸣器
