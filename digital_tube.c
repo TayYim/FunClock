@@ -7,10 +7,10 @@
  */
 void digital_display(int time)
 {
-    int unitPlace = time / 1 % 10;
-    int decadePlace = time / 10 % 10;
-	int display_time = 	 unitPlace + decadePlace * 16;
-    P3 = 	  display_time;
+    int unitPlace = time / 1 % 10;                   //个位
+    int decadePlace = time / 10 % 10;                //十位
+    int display_time = unitPlace + decadePlace * 16; //传递给数码管的数值
+    P3 = display_time;
 }
 
 /**

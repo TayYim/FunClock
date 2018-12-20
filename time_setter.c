@@ -1,8 +1,8 @@
 #include <reg51.h>
 sbit forward_btn = P2 ^ 7;  //key8
 sbit backward_btn = P2 ^ 6; //key7
-sbit t2_btn = P2 ^ 1;      //key2
-sbit t1_btn = P2 ^ 0;      //key1
+sbit t2_btn = P2 ^ 1;       //key2
+sbit t1_btn = P2 ^ 0;       //key1
 extern void digital_display(int time);
 
 /**
@@ -14,11 +14,10 @@ extern void digital_display(int time);
  */
 int set_time(int order)
 {
-    int t1_previous = t1_btn;
-    int t2_previous = t2_btn;
-    // t1个位，t2十位
-    int t1_count = 0;
-    int t2_count = 0;
+    int t1_previous = t1_btn; //记录t1_btn的上一次电位
+    int t2_previous = t2_btn; //记录t2_btn的上一次电位
+    int t1_count = 0;         //记录t1_btn的按键次数（时间的个位）
+    int t2_count = 0;         //记录t2_btn的按键次数（时间的十位）
 
     while (1)
     {
@@ -48,16 +47,15 @@ int set_time(int order)
             digital_display(t1_count + t2_count * 10); //刷新显示
         }
 
-        /* 按下确认按键后退出设置 */
-        if (order==1 & forward_btn==0)
+        /* 重复按下模式选择键后退出 */
+        if (order == 1 & forward_btn == 0)
         {
             break;
         }
-		if (order==-1 & backward_btn==0)
+        if (order == -1 & backward_btn == 0)
         {
             break;
         }
-
     }
-    return t1_count + 10 * t2_count;
+    return t1_count + 10 * t2_count; //返回设置的时间
 }

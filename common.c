@@ -1,5 +1,4 @@
-/** 参数 **/
-const int SECOND_PARAM = 1000;
+const int SECOND_PARAM = 1000; //每秒的delay()参数值
 
 /**
  * @brief 延时函数

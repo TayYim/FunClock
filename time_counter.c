@@ -12,34 +12,34 @@ extern void lcd_init();
  * @param order 顺序。1:正计时，-1:倒计时
  */
 void count_time(int time, int order)
-{	char str_prompt[20];
-	char str_reset[]={"Reset: Key 5"};
-    int i;
-    int curr_time; // 显示的时间
+{
+    char str_prompt[20];                 //显示提示的字符串
+    char str_reset[] = {"Reset: Key 5"}; //显示取消的字符串
+    int i;                               //计数变量
+    int curr_time;                       // 显示的时间
 
     if (order == 1)
     {
-        curr_time = 0; //正计时
-		sprintf(str_prompt,"Forward:%ds",time);
+        curr_time = 0; //正计时，从0开始
+        sprintf(str_prompt, "Forward:%ds", time);
     }
     else
     {
-        curr_time = time; //倒计时
-		sprintf(str_prompt,"Backward:%ds",time);
+        curr_time = time; //倒计时，从time开始
+        sprintf(str_prompt, "Backward:%ds", time);
     }
 
-	lcd_init();
-	display_string(0,0,str_prompt);	  	
-	display_string(1,0,str_reset);
-
+    lcd_init();                       //LCD初始化
+    display_string(0, 0, str_prompt); //显示模式信息
+    display_string(1, 0, str_reset);  //显示取消提示
 
     delay(200);
     digital_display(curr_time); //显示初始值
 
     for (i = 0; i <= time; i++)
     {
-        delay_second();             //等待1s
+        delay_second();                         //等待1s
         digital_display(curr_time + i * order); //更新数码管显示
     }
-	delay(200);
+    delay(200);
 }
