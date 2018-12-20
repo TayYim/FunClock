@@ -9,7 +9,8 @@ void digital_display(int time)
 {
     int unitPlace = time / 1 % 10;
     int decadePlace = time / 10 % 10;
-    P3 = unitPlace + decadePlace * 16;
+	int display_time = 	 unitPlace + decadePlace * 16;
+    P3 = 	  display_time;
 }
 
 /**

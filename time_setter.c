@@ -1,25 +1,25 @@
 #include <reg51.h>
-sbit confirm_btn = P2 ^ 5; //key6
+sbit forward_btn = P2 ^ 7;  //key8
+sbit backward_btn = P2 ^ 6; //key7
 sbit t2_btn = P2 ^ 1;      //key2
 sbit t1_btn = P2 ^ 0;      //key1
 extern void digital_display(int time);
 
 /**
  * @brief Set the time object
+ *
+ * @param order 顺序。1:正计时，-1:倒计时
  * 
  * @return int 计时时间(十进制)
  */
-int set_time()
+int set_time(int order)
 {
-    int t1_previous = 0;
-    int t2_previous = 0;
+    int t1_previous = t1_btn;
+    int t2_previous = t2_btn;
     // t1个位，t2十位
     int t1_count = 0;
     int t2_count = 0;
-    // 初始化
-    t1_btn = 0;
-    t2_btn = 0;
-    confirm_btn = 0;
+
     while (1)
     {
         /* 个位 */
@@ -49,10 +49,15 @@ int set_time()
         }
 
         /* 按下确认按键后退出设置 */
-        if (confirm_btn == 1)
+        if (order==1 & forward_btn==0)
         {
             break;
         }
+		if (order==-1 & backward_btn==0)
+        {
+            break;
+        }
+
     }
     return t1_count + 10 * t2_count;
 }

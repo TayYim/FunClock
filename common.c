@@ -1,5 +1,5 @@
 /** 参数 **/
-const int SECOND_PARAM = 500;
+const int SECOND_PARAM = 1000;
 
 /**
  * @brief 延时函数
